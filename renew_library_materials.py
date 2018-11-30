@@ -27,12 +27,13 @@ else:
 
 
 options = Options()
-options.set_headless(headless=True)
+# options.set_headless(headless=True)
 browser = webdriver.Firefox(firefox_options = options)
 browser.get(url)
 
 # wait for item to appear, then click it
-loginnow = WebDriverWait(browser, 10).until(ec.visibility_of_element_located((By.CLASS_NAME, "login_button")));
+loginnow = WebDriverWait(browser, 10).until(\
+        ec.visibility_of_element_located((By.CLASS_NAME, "login_button")));
 # print("finished waiting")
 uid = browser.find_element_by_id('user_id')
 uid.send_keys(user)
@@ -40,10 +41,10 @@ password = browser.find_element_by_id('password')
 password.send_keys(pin)
 # loginnow = browser.find_element_by_class('login_button')
 loginnow.click()
-
 # print("sleeping")
-sleep(5)
-renew_link = browser.find_element_by_link_text('Renew My Materials')
+renew_link = WebDriverWait(browser, 10).until(\
+        ec.visibility_of_element_located((By.LINK_TEXT, "Renew My Materials")));
+# renew_link = browser.find_element_by_link_text('Renew My Materials')
 renew_link.click()
 
 due_dates = [ _.text for _ in browser.find_elements_by_xpath("//td[@align='left']")]
@@ -65,8 +66,9 @@ for date in due_dates:
 if expire_soon == True:
     browser.find_element_by_id("renew_all").click()
     browser.find_element_by_xpath("//input[@value='Renew Selected Items']").click()
-    sleep(5)
-    due_dates = [ _.text for _ in browser.find_elements_by_xpath("//td[@align='left']")]
+    due_dates = WebDriverWait(browser, 10).until(\
+            ec.visibility_of_all_elements_located((By.XPATH,"//td[@align='left']")))
+    due_dates = [ _.text for _ in due_dates]
     print("New due dates:")
     print(*due_dates, sep='\n')
 else:
